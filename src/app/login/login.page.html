@@ -1,0 +1,41 @@
+<ion-header>
+    <ion-toolbar color="danger">
+        <ion-title>login</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-grid>
+        <ion-row class="ion-justify-content-center">
+            <div>
+                <ion-img src="/assets/icon/favicon.png" class="ion-margin ion-text-right"></ion-img>
+            </div>
+        </ion-row>
+
+        <ion-row class="ion-justify-content-center">
+            <ion-item>
+                <ion-label position="floating">
+                    Email</ion-label>
+                <ion-input type="email" [(ngModel)]="email"></ion-input>
+            </ion-item>
+
+            <ion-item>
+                <ion-label position="floating">
+                    Password</ion-label>
+                <ion-input [(ngModel)]="password" type="password"></ion-input>
+            </ion-item>
+        </ion-row>
+        <ion-row class="ion-justify-content-center">
+            <ion-button color="primary" (click)="login()" class="ion-padding ion-text-center" size="large">
+                Log In</ion-button>
+
+
+        </ion-row>
+
+        <ion-row class="ion-justify-content-center">
+            <a [routerLink]="['/register']" class="ion-padding">
+                Sign Up,Create New Account</a>
+        </ion-row>
+
+    </ion-grid>
+</ion-content>
