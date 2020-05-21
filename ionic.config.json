@@ -1,5 +1,7 @@
 {
   "name": "sdg-team-209",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }
