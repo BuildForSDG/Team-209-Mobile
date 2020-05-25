@@ -23,7 +23,7 @@
           style="width: 100%;"
         ></ion-img>
 
-        <div class="image-picker">
+        <div class="image-picker" *ngIf="!report.image_url">
           <ion-button color="primary" (click)="pickImage()">Pick Image </ion-button>
         </div>
       </ion-col>
@@ -34,7 +34,7 @@
         <ion-item>
           <ion-toolbar>
             <ion-buttons slot="primary">
-              <ion-button color="success" [disabled]="report.image_url" (click)="pickImage()">
+              <ion-button color="success" [disabled]="!report.image_url" (click)="pickImage()">
                 <ion-icon slot="icon-only" name="camera-reverse-outline"></ion-icon>
               </ion-button>
             </ion-buttons>
@@ -48,7 +48,7 @@
       <ion-col size-sm="4" offset-sm="4">
         <!-- Textarea in an item with a placeholder -->
         <ion-item>
-          <ion-textarea placeholder="Enter more information here..."></ion-textarea>
+          <ion-textarea placeholder="Enter more information here..." [(ngModel)]="description"></ion-textarea>
         </ion-item> </ion-col
     ></ion-row>
   </ion-grid>
