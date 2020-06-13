@@ -24,6 +24,7 @@ npm-debug.log*
 /.versions
 /.vscode
 /.firebaserc
+/.firebase
 /coverage
 /dist
 /node_modules
