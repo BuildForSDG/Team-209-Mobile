@@ -9,28 +9,22 @@ import { AuthService } from '../service/auth.service';
 export class Tab2Page implements OnInit {
   reports;
   staticMap: string;
+  loading: boolean;
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {}
 
   ionViewDidEnter() {
+    this.loading = true;
+
     this.authService.get_myreports().subscribe((res) => {
       console.log('reports loading', res);
+      this.loading = false;
       this.reports = res;
     });
   }
 
-  showMap(lat, long) {
-    return (
-      'https://maps.googleapis.com/maps/api/staticmap?center=' +
-      lat +
-      ',' +
-      long +
-      '&zoom=11&size=600x300&maptype=roadmap&markers=color:red%7Clabel:S%7C' +
-      lat +
-      ',' +
-      long +
-      '&key=AIzaSyD8KYUm6LCGPw8yzcdoDBszbMErYqMw3PI'
-    );
+  formatDate(date) {
+    return new Date(date).toDateString() + ' ' + new Date(date).toLocaleTimeString();
   }
 }
