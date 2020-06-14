@@ -8,6 +8,7 @@ import { map, tap, take, catchError } from 'rxjs/operators';
 export class AuthService {
   is_authenticated: boolean = false;
   user;
+  report_id;
   bearer_token: string;
   user_id: string;
   httpOptionsAuth;
@@ -148,6 +149,8 @@ export class AuthService {
     const form = new FormData();
     form.append('images[]', image);
     form.append('report_id', report.data.id);
+
+    this.report_id = report.data.id;
 
     return this.http.post('https://team-209-backend.herokuapp.com/api/attachments', form, this.httpOptionsAuth);
   }

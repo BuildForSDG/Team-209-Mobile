@@ -90,12 +90,13 @@ export class Tab1Page implements OnInit {
   submit() {
     this.submitting = true;
     console.log('submitting', this.report);
-
+    let report_id = '';
     this.authService
       .create_report(this.report.description, this.report.location.lng, this.report.location.lat)
       .pipe(
         switchMap((res) => {
           console.log('report response', res);
+
           return this.authService.upload_attachment(this.form.get('image').value, res);
         })
       )
@@ -106,8 +107,8 @@ export class Tab1Page implements OnInit {
 
           this.alertController
             .create({
-              header: 'New Report',
-              subHeader: 'ID:' + res.data[0].relationships.reports.data.id,
+              header: 'New Report #' + this.authService.report_id,
+              subHeader: '',
               message: 'Report sent successfully',
               buttons: ['OK']
             })
