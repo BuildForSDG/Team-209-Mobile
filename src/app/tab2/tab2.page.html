@@ -1,41 +1,52 @@
 <ion-header [translucent]="true">
-    <ion-toolbar color="primary">
-        <ion-title>
-            Logged Cases
-        </ion-title>
-    </ion-toolbar>
+  <ion-toolbar color="danger">
+    <ion-title>
+      Logged Cases
+    </ion-title>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-    <ion-header collapse="condense">
-        <ion-toolbar>
-            <ion-title size="large">Logged Cases</ion-title>
-        </ion-toolbar>
-    </ion-header>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Logged Cases</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-grid class="ion-no-padding ion-no-margin">
+    <ion-row *ngIf="loading">
+      <ion-col :span="12" align="center" class="ion-padding">
+        <ion-spinner color="primary"> </ion-spinner>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size-sm="4" offset-sm="4" class="ion-no-padding ion-no-margin" *ngIf="reports">
+        <ion-card *ngFor="let report of reports.included">
+          <ion-card-header>
+            <ion-img
+              src="https://maps.googleapis.com/maps/api/staticmap?center={{report.attributes.latitude}}
+             ,{{report.attributes.longitude}}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{{report.attributes.latitude}}
+             ,{{report.attributes.longitude}}&key=AIzaSyD8KYUm6LCGPw8yzcdoDBszbMErYqMw3PI"
+              class="ion-no-padding ion-no-margin"
+            ></ion-img>
 
-    <ion-card>
-        <ion-card-header>
-            <ion-img src="https://maps.googleapis.com/maps/api/staticmap?center=40.702147,-74.015794&zoom=11&size=600x300&maptype=roadmap&markers=color:red%7Clabel:S%7C40.702147,-74.015794&markers=color:red%7Clabel:S%7C40.749825,-73.987963&path=color:0x0000ff|weight:5|40.702147,-74.015794|40.749825,-73.987963
-                                                                                     &key=AIzaSyD8KYUm6LCGPw8yzcdoDBszbMErYqMw3PI" class="ion-no-padding"></ion-img>
+            <ion-card-title class="ion-text-center"># {{report.id}} </ion-card-title>
+            <!-- <ion-button fill="outline" color="success">Pending</ion-button> -->
+          </ion-card-header>
 
-            <ion-card-title class="ion-text-center">#111222
-            </ion-card-title>
-            <ion-button fill="outline" color="success">Pending</ion-button>
-        </ion-card-header>
-
-        <ion-card-content>
+          <ion-card-content>
             <h2>
-                Keep close to Nature's heart... and break clear away, once in awhile,
-                                                                             and climb a mountain or spend a week in the woods. Wash your spirit clean.</h2>
-        </ion-card-content>
+              {{report.attributes.description}}
+            </h2>
+            <h5>{{report.attributes.address}}</h5>
+          </ion-card-content>
 
-        <ion-item>
-            <ion-icon name="pin" slot="start" color='danger'></ion-icon>
-            <ion-label>Labels</ion-label>
-            <ion-button fill="outline" slot="end">View Chat</ion-button>
-        </ion-item>
-
-    </ion-card>
-
-
+          <ion-item>
+            <!-- <ion-icon name="pin" slot="start" color="primary">hii</ion-icon> -->
+            <ion-label style="color: grey; font-size: small;">{{formatDate(report.attributes.created_at)}}</ion-label>
+            <!-- <ion-button fill="outline" slot="end">Pending</ion-button> -->
+          </ion-item>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

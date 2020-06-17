@@ -48,14 +48,16 @@
       <ion-col size-sm="4" offset-sm="4">
         <!-- Textarea in an item with a placeholder -->
         <ion-item>
-          <ion-textarea placeholder="Enter more information here..." [(ngModel)]="description"></ion-textarea>
+          <ion-textarea placeholder="Enter more information here..." [(ngModel)]="report.description"></ion-textarea>
         </ion-item> </ion-col
     ></ion-row>
   </ion-grid>
   <!-- fab placed to the (vertical) center and start -->
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button>
-      <ion-icon name="navigate-outline"></ion-icon>
+  <ion-fab vertical="bottom" horizontal="center" slot="fixed" *ngIf="!submitting">
+    <ion-fab-button [disabled]="!report.image_url">
+      <ion-icon name="navigate-outline" (click)="submit()"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
+  <ion-spinner color="primary" slot="fixed" style="bottom: 30px; left: 48%;" *ngIf="submitting"></ion-spinner>
 </ion-content>

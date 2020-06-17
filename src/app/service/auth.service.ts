@@ -8,7 +8,10 @@ import { map, tap, take, catchError } from 'rxjs/operators';
 export class AuthService {
   is_authenticated: boolean = false;
   user;
+  report_id;
   bearer_token: string;
+  user_id: string;
+  httpOptionsAuth;
 
   cases = [];
 
@@ -17,14 +20,6 @@ export class AuthService {
       'Content-Type': 'application/vnd.api+json',
       Accept: 'application/vnd.api+json'
       // 'Authorization': `Bearer:${this.bearer_token}`
-    })
-  };
-
-  httpOptionsAuth = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/vnd.api+json',
-      Accept: 'application/vnd.api+json',
-      Authorization: `Bearer ${this.bearer_token}`
     })
   };
 
@@ -79,6 +74,7 @@ export class AuthService {
           this.user = tapdata;
           localStorage.setItem('auth_user', JSON.stringify(this.user));
           this.bearer_token = this.user.data.attributes.token;
+          this.user_id = this.user.data.included.id;
         })
       );
   }
@@ -88,6 +84,9 @@ export class AuthService {
     console.log('autologin', stored_user);
     if (stored_user) {
       this.user = stored_user;
+      this.bearer_token = this.user.data.attributes.token;
+      this.user_id = this.user.data.included.id;
+      console.log('bearer_token', this.bearer_token);
     } else {
       return;
     }
@@ -98,9 +97,88 @@ export class AuthService {
     localStorage.removeItem('auth_user');
   }
 
-  get_user_cases() {
-    // return user cases
+  get_myreports() {
+    this.httpOptionsAuth = {
+      headers: new HttpHeaders({
+        //'Content-Type': 'multipart/form-data',
+        //'Content-Type': 'application/vnd.api+json',
+        //'Content-Type': 'multipart/form-data; charset=utf-8; boundary=' + Math.random().toString().substr(2),
+        Accept: 'application/vnd.api+json',
+        Authorization: `Bearer ${this.bearer_token}`
+      })
+    };
+    return this.http.get(
+      'https://team-209-backend.herokuapp.com/api/users/' + this.user_id + '?include=reports',
+      this.httpOptionsAuth
+    );
   }
 
-  get_case() {}
+  upload_image(image: File) {
+    this.httpOptionsAuth = {
+      headers: new HttpHeaders({
+        //'Content-Type': 'multipart/form-data',
+        //'Content-Type': 'application/vnd.api+json',
+        //'Content-Type': 'multipart/form-data; charset=utf-8; boundary=' + Math.random().toString().substr(2),
+        Accept: 'application/vnd.api+json',
+        Authorization: `Bearer ${this.bearer_token}`
+      })
+    };
+    console.log('image-obj', image);
+    const form = new FormData();
+    form.append('image', image);
+    console.log(form, form.get('image'));
+    return this.http.post(
+      'https://team-209-backend.herokuapp.com/api/users/' + this.user_id + '/image',
+      form,
+      this.httpOptionsAuth
+    );
+  }
+
+  upload_attachment(image: File, report) {
+    this.httpOptionsAuth = {
+      headers: new HttpHeaders({
+        //'Content-Type': 'multipart/form-data',
+        //'Content-Type': 'application/vnd.api+json',
+        //'Content-Type': 'multipart/form-data; charset=utf-8; boundary=' + Math.random().toString().substr(2),
+        Accept: 'application/vnd.api+json',
+        Authorization: `Bearer ${this.bearer_token}`
+      })
+    };
+
+    console.log('image-obj', image);
+    const form = new FormData();
+    form.append('images[]', image);
+    form.append('report_id', report.data.id);
+
+    this.report_id = report.data.id;
+
+    return this.http.post('https://team-209-backend.herokuapp.com/api/attachments', form, this.httpOptionsAuth);
+  }
+
+  create_report(description, longitude, latitude) {
+    this.httpOptionsAuth = {
+      headers: new HttpHeaders({
+        //'Content-Type': 'multipart/form-data',
+        //'Content-Type': 'application/vnd.api+json',
+        //'Content-Type': 'multipart/form-data; charset=utf-8; boundary=' + Math.random().toString().substr(2),
+        Accept: 'application/vnd.api+json',
+        Authorization: `Bearer ${this.bearer_token}`
+      })
+    };
+
+    return this.http.post(
+      'https://team-209-backend.herokuapp.com/api/reports',
+      {
+        data: {
+          type: 'reports',
+          attributes: {
+            latitude: latitude.toString(),
+            longitude: longitude.toString(),
+            description: description
+          }
+        }
+      },
+      this.httpOptionsAuth
+    );
+  }
 }

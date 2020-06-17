@@ -1,18 +1,19 @@
+import { AuthService } from './../service/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { Plugins, Capacitor, CameraResultType } from '@capacitor/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { switchMap } from 'rxjs/operators';
+import { AlertController } from '@ionic/angular';
 
-@Component({
-  selector: 'app-tab1',
-  templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss']
-})
+@Component({ selector: 'app-tab1', templateUrl: 'tab1.page.html', styleUrls: ['tab1.page.scss'] })
 export class Tab1Page implements OnInit {
-  constructor() {}
+  constructor(private authService: AuthService, private alertController: AlertController) {}
 
   ngOnInit() {
-    // this.pickLocation();
+    this.form = new FormGroup({ image: new FormControl(null) });
   }
 
+  form: FormGroup;
   image: File;
   description: string;
   lat: number;
@@ -28,13 +29,10 @@ export class Tab1Page implements OnInit {
     image: this.image,
     date: new Date()
   };
+  submitting: boolean = false;
 
   pickImage() {
-    const image = Plugins.Camera.getPhoto({
-      quality: 60,
-      allowEditing: true,
-      resultType: CameraResultType.Base64
-    })
+    const image = Plugins.Camera.getPhoto({ quality: 60, allowEditing: true, resultType: CameraResultType.Base64 })
       .then((image) => {
         var imageUrl = image.base64String;
         console.log('image-string', image);
@@ -44,6 +42,7 @@ export class Tab1Page implements OnInit {
         try {
           imageFile = this.base64toBlob(imageUrl.replace('data:image/jpeg;base64,', ''), 'image/jpeg');
           this.report.image = imageFile;
+          this.form.patchValue({ image: imageFile });
           console.log('image', this.image);
 
           this.pickLocation();
@@ -56,7 +55,6 @@ export class Tab1Page implements OnInit {
         console.log('camera error:', error);
       });
 
-    this.report.description = this.description;
     console.log('imageFile', this.report);
   }
 
@@ -89,5 +87,52 @@ export class Tab1Page implements OnInit {
     return new Blob(byteArrays, { type: contentType });
   }
 
-  submit() {}
+  submit() {
+    this.submitting = true;
+    console.log('submitting', this.report);
+    let report_id = '';
+    this.authService
+      .create_report(this.report.description, this.report.location.lng, this.report.location.lat)
+      .pipe(
+        switchMap((res) => {
+          console.log('report response', res);
+
+          return this.authService.upload_attachment(this.form.get('image').value, res);
+        })
+      )
+      .subscribe(
+        (res) => {
+          console.log('image response', res);
+          this.submitting = false;
+
+          this.alertController
+            .create({
+              header: 'New Report #' + this.authService.report_id,
+              subHeader: '',
+              message: 'Report sent successfully',
+              buttons: ['OK']
+            })
+            .then((alert) => {
+              alert.present();
+            });
+
+          this.report.image_url = '';
+          this.report.description = '';
+        },
+        (error) => {
+          console.log('image error', error);
+          this.submitting = false;
+          this.alertController
+            .create({
+              header: 'Error Alert',
+              subHeader: '',
+              message: error.message,
+              buttons: ['OK']
+            })
+            .then((alert) => {
+              alert.present();
+            });
+        }
+      );
+  }
 }
